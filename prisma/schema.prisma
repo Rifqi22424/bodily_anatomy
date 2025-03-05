@@ -1,0 +1,83 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                       String        @id @default(cuid())
+  username                 String        @unique
+  email                    String        @unique
+  password                 String
+  isVerified               Boolean       @default(false)
+  verificationToken        String?
+  verificationTokenExpires DateTime?
+  modules                  Module[]
+  quizAttempts             QuizAttempt[]
+  createdAt                DateTime      @default(now())
+  updatedAt                DateTime      @updatedAt
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  content     String
+  x           Int
+  y           Int
+  imageUrl    String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  quiz        Quiz?
+  quizId      String?  @unique
+}
+
+model Quiz {
+  id          String        @id @default(cuid())
+  title       String
+  description String
+  questions   Question[]
+  attempts    QuizAttempt[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  moduleId    String        @unique
+  Module      Module        @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+}
+
+model Question {
+  id        String           @id @default(cuid())
+  text      String
+  imageUrl  String?
+  quiz      Quiz             @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizId    String
+  options   QuestionOption[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+model QuestionOption {
+  id         String   @id @default(cuid())
+  text       String
+  isCorrect  Boolean  @default(false)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+  createdAt  DateTime @default(now())
+}
+
+model QuizAttempt {
+  id             String @id @default(cuid())
+  user           User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  quiz           Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizId         String
+  score          Float
+  totalQuestions Int
+  correctAnswers Int
+
+  createdAt DateTime @default(now())
+}
