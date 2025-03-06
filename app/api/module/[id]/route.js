@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 // ✅ Get a single module
 export async function GET(req, { params }) {
-  const { id } = params;
+  const { id } = await params;
   console.log(id);
 
   try {
@@ -15,7 +15,8 @@ export async function GET(req, { params }) {
         title: true,
         description: true,
         content: true,
-        imageUrl: true,
+        outsideImageUrl: true,
+        insideImageUrl: true,
         quizId: true,
       },
     });

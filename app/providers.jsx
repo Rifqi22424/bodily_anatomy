@@ -5,8 +5,8 @@ import { QuizProvider } from "./contexts/quiz_context";
 
 export default function Provider({ children }) {
   return (
-    <QuizProvider>
-      <AuthProvider>{children}</AuthProvider>
-    </QuizProvider>
+    <AuthProvider>
+      <QuizProvider>{children}</QuizProvider>
+    </AuthProvider>
   );
 }

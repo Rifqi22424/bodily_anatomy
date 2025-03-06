@@ -10,8 +10,10 @@ import human from "../public/images/human.png";
 import animation_ornament from "../public/images/animation_ornament.png";
 import module_ornament from "../public/images/module_ornament.png";
 import quiz_ornament from "../public/images/quiz_ornament.png";
+import { useRouter } from "next/navigation";
 
 export default function Landing() {
+  const router = useRouter();
   useEffect(() => {
     AOS.init({
       duration: 1000,
@@ -34,47 +36,55 @@ export default function Landing() {
               <li>
                 <a
                   href="#"
-                  className="text-blue-800 hover:text-blue-600 transition-colors"
+                  className="text-blue-800 hover:text-blue-600 transition-colors font-semibold"
                 >
                   BERANDA
                 </a>
               </li>
-              <li>
+              {/* <li>
                 <a
                   href="#"
-                  className="text-blue-800 hover:text-blue-600 transition-colors"
+                  className="text-blue-800 hover:text-blue-600 transition-colors font-semibold"
                 >
                   TENTANG
                 </a>
-              </li>
+              </li> */}
               <li>
                 <a
                   href="#"
-                  className="text-blue-800 hover:text-blue-600 transition-colors"
+                  className="text-blue-800 hover:text-blue-600 transition-colors font-semibold"
                 >
                   KONTAK
                 </a>
               </li>
-              <li>
+              {/* <li>
                 <a
                   href="#"
-                  className="text-blue-800 hover:text-blue-600 transition-colors"
+                  className="text-blue-800 hover:text-blue-600 transition-colors font-semibold"
                 >
                   BANTUAN
                 </a>
-              </li>
+              </li> */}
               <li>
                 <a
+                  onClick={(e) => {
+                    e.preventDefault(); // Mencegah navigasi default
+                    router.push("/register");
+                  }}
                   href="#"
-                  className="text-blue-800 hover:text-blue-600 transition-colors"
+                  className="text-blue-800 hover:text-blue-600 transition-colors font-semibold"
                 >
                   DAFTAR
                 </a>
               </li>
               <li>
                 <a
+                  onClick={(e) => {
+                    e.preventDefault(); // Mencegah navigasi default
+                    router.push("/login");
+                  }}
                   href="#"
-                  className="bg-yellow-400 text-blue-900 px-4 py-2 rounded-full hover:bg-yellow-500 transition-colors"
+                  className="bg-yellow-400 text-white px-4 py-2 rounded hover:bg-yellow-500 transition-colors font-semibold"
                 >
                   MASUK
                 </a>
@@ -113,8 +123,11 @@ export default function Landing() {
                 mudah di aplikasi terstruktur dan terpercaya untuk memahami
                 anatomi manusia.
               </p>
-              <button className="bg-yellow-400 text-blue-900 px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:bg-yellow-500 transition-colors transform hover:scale-105">
-                Registrasi sekarang
+              <button
+                onClick={() => router.push("/register")}
+                className="bg-yellow-400 text-white px-8 py-4 rounded font-semibold text-lg shadow-lg hover:bg-yellow-500 transition-colors transform hover:scale-105 cursor-pointer"
+              >
+                Coba sekarang
               </button>
             </div>
             <div className="" data-aos="fade-left">
@@ -163,7 +176,7 @@ export default function Landing() {
         <section className="py-20 px-6 bg-blue-100 text-center">
           <div className="max-w-7xl mx-auto" data-aos="zoom-in">
             <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-8">
-              DAFTAR SEKARANG JUGA
+              DAFTAR SEKARANG
             </h2>
             <p className="text-blue-800 mb-10 max-w-3xl mx-auto text-lg">
               Bergabunglah bersama kami untuk mendapatkan pengalaman belajar
@@ -171,8 +184,11 @@ export default function Landing() {
               anatomi yang menyenangkan dan interaktif! Jangan lewatkan
               kesempatan ini!
             </p>
-            <button className="bg-yellow-400 text-blue-900 px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:bg-yellow-500 transition-colors transform hover:scale-105">
-              Registrasi sekarang
+            <button
+              onClick={() => router.push("/register")}
+              className="bg-yellow-400 text-white px-8 py-4 rounded font-semibold text-lg shadow-lg hover:bg-yellow-500 transition-colors transform hover:scale-105 cursor-pointer"
+            >
+              Coba sekarang
             </button>
           </div>
         </section>
@@ -297,7 +313,7 @@ export default function Landing() {
             </div>
             <div className="text-center mt-10">
               <button
-                className="bg-blue-600 text-white px-8 py-3 rounded-full font-semibold text-lg shadow-lg hover:bg-blue-700 transition-colors transform hover:scale-105"
+                className="bg-blue-600 text-white px-8 py-3 rounded font-semibold text-lg shadow-lg hover:bg-blue-700 transition-colors transform hover:scale-105 cursor-pointer"
                 data-aos="zoom-in"
               >
                 Kirim Feedback

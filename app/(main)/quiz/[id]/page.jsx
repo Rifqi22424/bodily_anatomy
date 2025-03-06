@@ -3,17 +3,25 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuiz } from "../../../contexts/quiz_context";
+import { useAuth } from "../../../contexts/auth_context";
 
 export default function Quiz() {
   const router = useRouter();
   const { id } = useParams();
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const { token } = useAuth();
   const { answers, saveAnswer, submitQuiz, startQuiz, currentQuiz } = useQuiz();
 
   useEffect(() => {
     if (id) {
-      fetch(`/api/quiz/${id}`)
+      fetch(`/api/quiz/${id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`, // Gunakan token dari user
+          "Content-Type": "application/json",
+        },
+      })
         .then((res) => res.json())
         .then((data) => {
           if (data?.questions?.length > 0) {
@@ -23,7 +31,7 @@ export default function Quiz() {
         })
         .catch((error) => console.error("Error fetching quiz:", error));
     }
-  }, [id, startQuiz]);
+  }, []);
 
   const handleAnswer = (answerText) => {
     if (questions[currentQuestion]) {
@@ -38,20 +46,30 @@ export default function Quiz() {
   const handleSubmit = async () => {
     try {
       const result = await submitQuiz();
+      console.log(result);
+
       if (result) {
-        router.push(`/quiz/result/${id}`);
+        router.push(`/quiz/result/${result.data.id}`);
       }
     } catch (error) {
       console.error("Error submitting quiz:", error);
     }
   };
 
-  if (!questions.length) return <div>Loading...</div>;
+  if (!questions.length)
+    return (
+      <div className=" bg-gradient-to-b from-blue-50 to-blue-200 text-black h-screen w-screen flex flex-col justify-center items-center">
+        <div className="w-20 h-20 animate-spin">
+          <span className="text-4xl">🦴</span>
+        </div>
+        <p className="mt-4 text-lg font-semibold text-blue-800">Loading...</p>
+      </div>
+    );
 
   const question = questions[currentQuestion];
 
   return (
-    <div className="min-h-screen bg-blue-100 p-4">
+    <div className="min-h-screen  bg-gradient-to-b from-blue-50 to-blue-200 p-4">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="mb-6">
@@ -70,29 +88,30 @@ export default function Quiz() {
 
           <div className="mb-8">
             <h2 className="text-xl font-bold text-blue-900 mb-4">
-              {question.question}
+              {question.text}
             </h2>
-            {question.image && (
+            {question.imageUrl && (
               <img
-                src={question.image || "/placeholder.svg"}
+                src={question.imageUrl || "/placeholder.svg"}
                 alt="Question illustration"
-                width={400}
-                height={400}
-                className="mx-auto mb-6"
+                width={200}
+                height={200}
+                className="mx-auto mb-2"
               />
             )}
           </div>
 
-          <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4 text-blue-900">
             {question.options.map((option) => (
               <button
                 key={option.id}
-                className={`w-full p-4 text-left rounded-lg border ${
-                  answers[question.id] === option.text
+                className={`w-full p-4 text-left rounded-lg border cursor-pointer ${
+                  answers.find((a) => a.questionId === question.id)
+                    ?.optionId === option.id
                     ? "border-yellow-400 bg-yellow-50"
                     : "border-gray-200 hover:border-yellow-400"
                 }`}
-                onClick={() => handleAnswer(option.text)}
+                onClick={() => handleAnswer(option.id)}
               >
                 {option.text}
               </button>
@@ -102,7 +121,7 @@ export default function Quiz() {
           {currentQuestion === questions.length - 1 && (
             <button
               onClick={handleSubmit}
-              className="mt-8 w-full bg-yellow-400 text-blue-900 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition-colors"
+              className="mt-8 w-full bg-yellow-400 text-white py-3 rounded-lg font-semibold hover:bg-yellow-500 transition-colors cursor-pointer"
             >
               Selesai
             </button>

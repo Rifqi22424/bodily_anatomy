@@ -1,7 +1,10 @@
-"use client"
+"use client";
 
 import React, { useState } from "react";
 import { useAuth } from "../../contexts/auth_context";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -11,7 +14,9 @@ export default function RegisterForm() {
     confirmPassword: "",
   });
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null); // State baru untuk pesan sukses
   const { register } = useAuth();
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,118 +29,135 @@ export default function RegisterForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setSuccessMessage(null); // Reset pesan sukses setiap submit
 
-    // Basic validation
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
-    // Prepare data for registration
     const { confirmPassword, ...registrationData } = formData;
 
     try {
-      await register(registrationData);
+      const response = await register(registrationData);
+      if (response.message) {
+        setSuccessMessage(response.message);
+      }
     } catch (err) {
       setError(err.message || "Registration failed");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create Your Account
-          </h2>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="text-red-500 text-center mb-4">{error}</div>
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-blue-300 p-6">
+      <button
+        onClick={() => router.push("/")}
+        className="flex items-center text-blue-900 mb-8 cursor-pointer"
+      >
+        <ArrowLeft className="w-5 h-5 mr-2" />
+        Kembali
+      </button>
+
+      <div className="max-w-md mx-auto bg-gradient-to-b from-blue-300 to-blue-400 rounded-3xl p-8 mt-12">
+        <h2 className="text-2xl font-bold text-white mb-8 text-center">
+          DAFTAR
+        </h2>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Tampilkan pesan sukses */}
+          {successMessage && (
+            <div className="text-green-900 text-center text-sm bg-green-300 py-2 rounded-lg">
+              {successMessage}
+            </div>
           )}
-          <div className="rounded-md shadow-sm -space-y-px">
+
+          {error && (
+            <div className="text-red-100 text-center text-sm bg-red-500/20 py-2 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-4">
             <div>
-              <label htmlFor="username" className="sr-only">
-                Username
-              </label>
+              <label className="text-white mb-2 block">Nama</label>
               <input
-                id="username"
                 name="username"
                 type="text"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Username"
+                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                placeholder="masukan nama lengkap"
                 value={formData.username}
                 onChange={handleChange}
               />
             </div>
+
             <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
+              <label className="text-white mb-2 block">Email</label>
               <input
-                id="email"
                 name="email"
                 type="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                placeholder="masukan email anda"
                 value={formData.email}
                 onChange={handleChange}
               />
             </div>
+
             <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
+              <label className="text-white mb-2 block">Kata sandi</label>
               <input
-                id="password"
                 name="password"
                 type="password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
+                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                placeholder="masukan kata sandi anda"
                 value={formData.password}
                 onChange={handleChange}
               />
             </div>
+
             <div>
-              <label htmlFor="confirmPassword" className="sr-only">
-                Confirm Password
+              <label className="text-white mb-2 block">
+                Konfirmasi kata sandi
               </label>
               <input
-                id="confirmPassword"
                 name="confirmPassword"
                 type="password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Confirm Password"
+                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                placeholder="konfirmasi kata sandi anda"
                 value={formData.confirmPassword}
                 onChange={handleChange}
               />
             </div>
           </div>
 
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Register
-            </button>
+          <div className="text-right">
+            <Link href="/login" className="text-white text-sm hover:underline">
+              Sudah memiliki akun? Masuk sekarang
+            </Link>
           </div>
+
+          <button
+            type="submit"
+            className="w-full bg-yellow-400 text-white font-semibold py-3 rounded-full hover:bg-yellow-300 transition-colors cursor-pointer"
+          >
+            Masuk
+          </button>
+
+          {/* <button
+            type="button"
+            className="w-full bg-white text-gray-600 font-semibold py-3 rounded-full hover:bg-gray-50 transition-colors flex items-center justify-center"
+          >
+            <img
+              src="https://www.google.com/favicon.ico"
+              alt="Google"
+              className="w-5 h-5 mr-2"
+            />
+            Masuk dengan google
+          </button> */}
         </form>
-        <div className="text-center">
-          <p className="mt-2 text-sm text-gray-600">
-            Already have an account?{" "}
-            <a
-              href="/login"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
-            >
-              Sign in here
-            </a>
-          </p>
-        </div>
       </div>
     </div>
   );

@@ -1,17 +1,26 @@
+import { verifyToken } from "../../../utils/auth";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 // ✅ Get a quiz by ID
-export async function GET(req) {
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id"); // Ambil ID dari query parameter
+// export async function GET(req, context) {
+//   const { params } = context;
+//   const id = params?.id;
+export async function GET(req, { params }) {
+  const token = req.headers.get("Authorization")?.split(" ")[1];
+  const decoded = verifyToken(token);
 
-  if (!id) {
-    return Response.json({ message: "Quiz ID is required" }, { status: 400 });
+  if (!decoded) {
+    return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   try {
+    const { id } = await params; // Ambil ID dari params
+
+    if (!id) {
+      return Response.json({ message: "Quiz ID is required" }, { status: 400 });
+    }
     const quiz = await prisma.quiz.findUnique({
       where: { id },
       include: {

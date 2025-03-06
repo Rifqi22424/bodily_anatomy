@@ -25,21 +25,35 @@ export async function POST(req) {
     let y = formData.get("y");
     x = parseInt(x);
     y = parseInt(y);
-    const image = formData.get("image"); // File input
+    const outsideImage = formData.get("outsideImage"); // File input
+    const insideImage = formData.get("insideImage"); // File input
 
-    if (!title || !description || !content || !image) {
+    if (!title || !description || !content || !outsideImage || !insideImage) {
       return Response.json(
         { message: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    // Save the image locally (or replace this with cloud storage logic)
-    const filePath = `./public/uploads/${Date.now()}-${image.name}`;
-    await writeFile(filePath, Buffer.from(await image.arrayBuffer()));
+    // Save the outsideImage locally (or replace this with cloud storage logic)
+    const outsideImageFilePath = `./public/uploads/${Date.now()}-${
+      outsideImage.name
+    }`;
+    const insideImageFilePath = `./public/uploads/${Date.now()}-${
+      insideImage.name
+    }`;
+    await writeFile(
+      outsideImageFilePath,
+      Buffer.from(await outsideImage.arrayBuffer())
+    );
+    await writeFile(
+      insideImageFilePath,
+      Buffer.from(await insideImage.arrayBuffer())
+    );
 
     // Generate the URL (modify this for cloud storage)
-    const imageUrl = `/uploads/${path.basename(filePath)}`;
+    const outsideImageUrl = `/uploads/${path.basename(outsideImageFilePath)}`;
+    const insideImageUrl = `/uploads/${path.basename(insideImageFilePath)}`;
 
     // Create the module entry in the database
     const module = await prisma.module.create({
@@ -49,7 +63,8 @@ export async function POST(req) {
         x,
         y,
         content,
-        imageUrl,
+        outsideImageUrl,
+        insideImageUrl,
         userId: decoded.id,
       },
     });
@@ -74,6 +89,9 @@ export async function GET(req) {
     const modules = await prisma.module.findMany({
       select: {
         id: true,
+        title: true,
+        outsideImageUrl: true,
+        description: true,
         x: true,
         y: true,
       },
@@ -99,7 +117,7 @@ export async function PUT(req) {
 
     const module = await prisma.module.findUnique({ where: { id } });
 
-    if (!module || module.userId !== decoded.id) {
+    if (!module || decoded.role !== "ADMIN") {
       return Response.json(
         { message: "Module not found or unauthorized" },
         { status: 403 }
@@ -132,7 +150,7 @@ export async function DELETE(req) {
 
     const module = await prisma.module.findUnique({ where: { id } });
 
-    if (!module || module.userId !== decoded.id) {
+    if (!module || decoded.role !== "ADMIN") {
       return Response.json(
         { message: "Module not found or unauthorized" },
         { status: 403 }

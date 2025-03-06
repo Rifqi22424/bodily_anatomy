@@ -1,11 +1,12 @@
-"use client"
+"use client";
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import * as authService from '../services/auth_service';
-import { useRouter } from 'next/navigation';
+import React, { createContext, useState, useContext, useEffect } from "react";
+import * as authService from "../services/auth_service";
+import { useRouter } from "next/navigation";
 
 const AuthContext = createContext({
-  user: null,
+  token: null,
+  role: null,
   login: async () => {},
   register: async () => {},
   logout: () => {},
@@ -13,32 +14,50 @@ const AuthContext = createContext({
 });
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(() => {
+    return typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  });
+
+  const [role, setRole] = useState(() => {
+    return typeof window !== "undefined" ? localStorage.getItem("role") : null;
+  });
+
   const router = useRouter();
 
   useEffect(() => {
-    // Check for existing token on initial load
-    const token = localStorage.getItem('token');
-    if (token) {
-      const userData = JSON.parse(localStorage.getItem('user'));
-      setUser(userData);
+    if (typeof window !== "undefined") {
+      const storedToken = localStorage.getItem("token");
+      const storedRole = localStorage.getItem("role");
+
+      if (storedToken) {
+        setToken(storedToken);
+      }
+
+      if (storedRole) {
+        setRole(storedRole);
+      }
     }
   }, []);
 
   const login = async (credentials) => {
     try {
       const response = await authService.login(credentials);
-      
-      // Store token and user info
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      
-      setUser(response.user);
-      router.push('/dashboard');
-      
+
+      // Simpan token dan role di localStorage
+      const userToken = response.token;
+      const userRole = response.role; // Pastikan API mengembalikan role
+
+      localStorage.setItem("token", userToken);
+      localStorage.setItem("role", userRole);
+
+      setToken(userToken);
+      setRole(userRole);
+
+      router.push("/home");
+
       return response;
     } catch (error) {
-      console.error('Login failed', error);
+      console.error("Login failed", error);
       throw error;
     }
   };
@@ -46,34 +65,38 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const response = await authService.register(userData);
-      router.push('/login');
       return response;
     } catch (error) {
-      console.error('Registration failed', error);
+      console.error("Registration failed", error);
       throw error;
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-    router.push('/login');
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+
+    setToken(null);
+    setRole(null);
+
+    router.push("/");
   };
 
   const verifyEmail = async (token) => {
     try {
       const response = await authService.verifyEmail(token);
-      router.push('/login');
+      router.push("/login");
       return response;
     } catch (error) {
-      console.error('Email verification failed', error);
+      console.error("Email verification failed", error);
       throw error;
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, verifyEmail }}>
+    <AuthContext.Provider
+      value={{ token, role, login, register, logout, verifyEmail }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -12,6 +12,7 @@ model User {
   username                 String        @unique
   email                    String        @unique
   password                 String
+  role                     String        @default("USER")
   isVerified               Boolean       @default(false)
   verificationToken        String?
   verificationTokenExpires DateTime?
@@ -22,19 +23,20 @@ model User {
 }
 
 model Module {
-  id          String   @id @default(cuid())
-  title       String
-  description String
-  content     String
-  x           Int
-  y           Int
-  imageUrl    String?
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  quiz        Quiz?
-  quizId      String?  @unique
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  content         String
+  x               Int
+  y               Int
+  outsideImageUrl String?
+  insideImageUrl  String?
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  quiz            Quiz?
+  quizId          String?  @unique
 }
 
 model Quiz {

@@ -51,7 +51,7 @@ export async function POST(req) {
         if (image) {
           const filePath = `./public/uploads/${Date.now()}-${image.name}`;
           await writeFile(filePath, Buffer.from(await image.arrayBuffer()));
-          imageUrl = `/public/uploads/${path.basename(filePath)}`;
+          imageUrl = `/uploads/${path.basename(filePath)}`;
         }
 
         return {
@@ -143,7 +143,7 @@ export async function PUT(req) {
     const score = (correctAnswers / totalQuestions) * 100;
 
     // Save quiz attempt
-    await prisma.quizAttempt.create({
+    const result = await prisma.quizAttempt.create({
       data: {
         userId: decoded.id,
         quizId,
@@ -154,7 +154,15 @@ export async function PUT(req) {
     });
 
     return Response.json(
-      { score, correctAnswers, totalQuestions, passed: score >= 70 },
+      {
+        data: {
+          id: result.id,
+          // score,
+          // correctAnswers,
+          // totalQuestions,
+          // passed: score >= 70,
+        },
+      },
       { status: 200 }
     );
   } catch (error) {

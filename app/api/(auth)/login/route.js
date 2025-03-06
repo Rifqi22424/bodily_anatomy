@@ -47,6 +47,7 @@ export async function POST(req) {
       {
         message: "Login successful",
         token,
+        role: user.role,
       },
       { status: 200 }
     );
