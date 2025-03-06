@@ -13,14 +13,14 @@ export default function Sidebar() {
 
   let menuItems = [
     { title: "Home", href: "/home" },
-    { title: "Laporan belajar", href: "/quiz/result" },
+    { title: "Laporan Belajar", href: "/quiz/result" },
     { title: "Keluar", action: () => setIsModalOpen(true) },
   ];
 
   if (role === "ADMIN") {
     menuItems = [
       ...menuItems,
-      { title: "Kelola module", href: "/admin/module" },
+      { title: "Kelola Modul", href: "/admin/module" },
       { title: "Kelola Quiz", href: "/admin/quiz" },
     ];
   }
@@ -57,12 +57,12 @@ export default function Sidebar() {
             >
               <X size={24} />
             </button>
-            <button
+            {/* <button
               className="text-blue-900 hidden md:block cursor-pointer"
               onClick={() => router.push("/")}
             >
               <ChevronLeft size={24} />
-            </button>
+            </button> */}
           </div>
 
           <div className="mb-8 cursor-pointer" onClick={() => router.push("/home")}>

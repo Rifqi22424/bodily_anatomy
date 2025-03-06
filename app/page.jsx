@@ -2,7 +2,7 @@
 
 import Head from "next/head";
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import heart from "../public/images/heart.png";
@@ -14,6 +14,8 @@ import { useRouter } from "next/navigation";
 
 export default function Landing() {
   const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   useEffect(() => {
     AOS.init({
       duration: 1000,
@@ -21,11 +23,16 @@ export default function Landing() {
     });
   }, []);
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-300">
+    <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-b from-blue-200 to-blue-300">
       <Head>
         <title>INFIL - Studi Anatomi Interaktif</title>
         <link rel="icon" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
 
       <header className="bg-white py-4 px-6 shadow-md fixed w-full z-10">
@@ -41,30 +48,14 @@ export default function Landing() {
                   BERANDA
                 </a>
               </li>
-              {/* <li>
-                <a
-                  href="#"
-                  className="text-blue-800 hover:text-blue-600 transition-colors font-semibold"
-                >
-                  TENTANG
-                </a>
-              </li> */}
               <li>
                 <a
-                  href="#"
+                  href="#kontak"
                   className="text-blue-800 hover:text-blue-600 transition-colors font-semibold"
                 >
                   KONTAK
                 </a>
               </li>
-              {/* <li>
-                <a
-                  href="#"
-                  className="text-blue-800 hover:text-blue-600 transition-colors font-semibold"
-                >
-                  BANTUAN
-                </a>
-              </li> */}
               <li>
                 <a
                   onClick={(e) => {
@@ -84,14 +75,18 @@ export default function Landing() {
                     router.push("/login");
                   }}
                   href="#"
-                  className="bg-yellow-400 text-white px-4 py-2 rounded hover:bg-yellow-500 transition-colors font-semibold"
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors font-semibold"
                 >
                   MASUK
                 </a>
               </li>
             </ul>
           </nav>
-          <button className="md:hidden text-blue-800">
+          <button
+            className="md:hidden text-blue-800 focus:outline-none"
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"
@@ -108,6 +103,56 @@ export default function Landing() {
             </svg>
           </button>
         </div>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden bg-white mt-4 py-4 px-6 shadow-md">
+            <ul className="flex flex-col space-y-4">
+              <li>
+                <a
+                  href="#"
+                  className="text-blue-800 hover:text-blue-600 transition-colors font-semibold block"
+                >
+                  BERANDA
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-blue-800 hover:text-blue-600 transition-colors font-semibold block"
+                >
+                  KONTAK
+                </a>
+              </li>
+              <li>
+                <a
+                  onClick={(e) => {
+                    e.preventDefault();
+                    router.push("/register");
+                    setIsMenuOpen(false);
+                  }}
+                  href="#"
+                  className="text-blue-800 hover:text-blue-600 transition-colors font-semibold block"
+                >
+                  DAFTAR
+                </a>
+              </li>
+              <li>
+                <a
+                  onClick={(e) => {
+                    e.preventDefault();
+                    router.push("/login");
+                    setIsMenuOpen(false);
+                  }}
+                  href="#"
+                  className="bg-yellow-400 text-white px-4 py-2 rounded hover:bg-yellow-500 transition-colors font-semibold inline-block"
+                >
+                  MASUK
+                </a>
+              </li>
+            </ul>
+          </div>
+        )}
       </header>
 
       <main className="pt-20">
@@ -125,18 +170,18 @@ export default function Landing() {
               </p>
               <button
                 onClick={() => router.push("/register")}
-                className="bg-yellow-400 text-white px-8 py-4 rounded font-semibold text-lg shadow-lg hover:bg-yellow-500 transition-colors transform hover:scale-105 cursor-pointer"
+                className="bg-blue-600 text-white px-8 py-4 rounded font-semibold text-lg shadow-lg hover:bg-blue-700 transition-colors transform hover:scale-105 cursor-pointer"
               >
                 Coba sekarang
               </button>
             </div>
-            <div className="" data-aos="fade-left">
+            <div className="w-full md:w-auto" data-aos="fade-left">
               <Image
                 src={heart}
                 alt="Heart Anatomy"
                 width={400}
                 height={400}
-                className="rounded-lg shadow-2xl"
+                className="rounded-lg shadow-2xl max-w-full h-auto"
               />
             </div>
           </div>
@@ -148,13 +193,13 @@ export default function Landing() {
               Pelajari anatomi dengan lebih mudah dan interaktif!
             </h2>
             <div className="flex flex-col md:flex-row items-center justify-evenly">
-              <div className="max-w-1/2">
+              <div className="w-full md:w-1/2 mb-10 md:mb-0">
                 <p className="text-blue-800 mb-6 text-lg">
                   Manfaatkan pengalaman Anda melalui pembelajaran interaktif
                   tentang anatomi tubuh yang dirancang khusus untuk membuat
                   pemahaman menjadi lebih menyenangkan dan mendalam.
                 </p>
-                <p className="text-blue-800 md:mb-0 mb-6 text-lg">
+                <p className="text-blue-800 text-lg">
                   Jelajahi setiap bagian tubuh, mulai dari sistem otot hingga
                   organ dalam, dengan visualisasi 3D yang menarik dan detail
                   secara akurat. Uji pemahaman Anda melalui kuis interaktif dan
@@ -162,13 +207,15 @@ export default function Landing() {
                   pembelajaran.
                 </p>
               </div>
-              <Image
-                src={human}
-                alt="Heart Anatomy"
-                width={400}
-                height={400}
-                className="rounded-lg shadow-2xl"
-              />
+              <div className="w-full md:w-auto">
+                <Image
+                  src={human}
+                  alt="Human Anatomy"
+                  width={400}
+                  height={400}
+                  className="rounded-lg shadow-2xl max-w-full h-auto"
+                />
+              </div>
             </div>
           </div>
         </section>
@@ -186,7 +233,7 @@ export default function Landing() {
             </p>
             <button
               onClick={() => router.push("/register")}
-              className="bg-yellow-400 text-white px-8 py-4 rounded font-semibold text-lg shadow-lg hover:bg-yellow-500 transition-colors transform hover:scale-105 cursor-pointer"
+              className="bg-blue-600 text-white px-8 py-4 rounded font-semibold text-lg shadow-lg hover:bg-blue-700 transition-colors transform hover:scale-105 cursor-pointer"
             >
               Coba sekarang
             </button>
@@ -212,7 +259,7 @@ export default function Landing() {
                   alt="Anatomy Topic"
                   width={200}
                   height={200}
-                  className="mb-6 mx-auto"
+                  className="mb-6 mx-auto max-w-full h-auto"
                 />
                 <h3 className="text-xl font-semibold text-blue-900 mb-4 text-center">
                   Modul topik pelajaran anatomi
@@ -232,7 +279,7 @@ export default function Landing() {
                   alt="2D Animation"
                   width={200}
                   height={200}
-                  className="mb-6 mx-auto"
+                  className="mb-6 mx-auto max-w-full h-auto"
                 />
                 <h3 className="text-xl font-semibold text-blue-900 mb-4 text-center">
                   Animasi 2D
@@ -252,7 +299,7 @@ export default function Landing() {
                   alt="Website Features"
                   width={200}
                   height={200}
-                  className="mb-6 mx-auto"
+                  className="mb-6 mx-auto max-w-full h-auto"
                 />
                 <h3 className="text-xl font-semibold text-blue-900 mb-4 text-center">
                   Fitur interaktif website
@@ -269,6 +316,7 @@ export default function Landing() {
         <section className="py-20 px-6 bg-blue-100">
           <div className="max-w-7xl mx-auto">
             <h2
+              id="kontak"
               className="text-3xl md:text-4xl font-bold text-blue-900 mb-12 text-center"
               data-aos="fade-up"
             >
@@ -329,7 +377,7 @@ export default function Landing() {
             <div className="text-2xl font-bold mb-4 md:mb-0">INFIL</div>
             <nav>
               <ul className="flex flex-wrap justify-center space-x-6">
-                <li>
+                {/* <li>
                   <a
                     href="#"
                     className="hover:text-yellow-400 transition-colors"
@@ -344,7 +392,7 @@ export default function Landing() {
                   >
                     DEVELOPERS
                   </a>
-                </li>
+                </li> */}
                 <li>
                   <a
                     href="#"

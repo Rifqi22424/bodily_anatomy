@@ -8,8 +8,8 @@ import Link from "next/link";
 
 export default function LoginForm() {
   const [loginData, setLoginData] = useState({
-    credential: "rifqimuzakki45@gmail.com",
-    password: "password",
+    credential: "",
+    password: "",
   });
   const [error, setError] = useState(null);
   const { login } = useAuth();
@@ -58,12 +58,12 @@ export default function LoginForm() {
 
           <div className="space-y-4">
             <div>
-              <label className="text-white mb-2 block">Email</label>
+              <label className="text-white mb-2 block">Email/ Username</label>
               <input
                 name="credential"
                 type="text"
                 required
-                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="masukan email anda"
                 value={loginData.credential}
                 onChange={handleChange}
@@ -76,7 +76,7 @@ export default function LoginForm() {
                 name="password"
                 type="password"
                 required
-                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="masukan kata sandi anda"
                 value={loginData.password}
                 onChange={handleChange}
@@ -95,7 +95,7 @@ export default function LoginForm() {
 
           <button
             type="submit"
-            className="w-full bg-yellow-400 text-white font-semibold py-3 rounded-full hover:bg-yellow-300 transition-colors cursor-pointer"
+            className="w-full bg-blue-600 text-white font-semibold py-3 rounded-full hover:bg-blue-700 transition-colors cursor-pointer"
           >
             Masuk
           </button>

@@ -84,7 +84,7 @@ export default function RegisterForm() {
                 name="username"
                 type="text"
                 required
-                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="masukan nama lengkap"
                 value={formData.username}
                 onChange={handleChange}
@@ -97,7 +97,7 @@ export default function RegisterForm() {
                 name="email"
                 type="email"
                 required
-                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="masukan email anda"
                 value={formData.email}
                 onChange={handleChange}
@@ -110,7 +110,7 @@ export default function RegisterForm() {
                 name="password"
                 type="password"
                 required
-                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="masukan kata sandi anda"
                 value={formData.password}
                 onChange={handleChange}
@@ -125,7 +125,7 @@ export default function RegisterForm() {
                 name="confirmPassword"
                 type="password"
                 required
-                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                className="w-full px-4 py-3 rounded-full bg-white/90 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="konfirmasi kata sandi anda"
                 value={formData.confirmPassword}
                 onChange={handleChange}
@@ -141,9 +141,9 @@ export default function RegisterForm() {
 
           <button
             type="submit"
-            className="w-full bg-yellow-400 text-white font-semibold py-3 rounded-full hover:bg-yellow-300 transition-colors cursor-pointer"
+            className="w-full bg-blue-600 text-white font-semibold py-3 rounded-full hover:bg-blue-700 transition-colors cursor-pointer"
           >
-            Masuk
+            Daftar
           </button>
 
           {/* <button
