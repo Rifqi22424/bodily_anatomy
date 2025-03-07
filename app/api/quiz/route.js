@@ -1,7 +1,7 @@
+//quiz
 import { PrismaClient } from "@prisma/client";
 import { verifyToken } from "../../utils/auth";
-import { writeFile } from "fs/promises";
-import path from "path";
+import { del, put } from "@vercel/blob";
 
 const prisma = new PrismaClient();
 
@@ -29,34 +29,58 @@ export async function POST(req) {
       );
     }
 
-    // **Cek apakah sudah ada kuis untuk moduleId ini**
+    // Check if a quiz already exists for this moduleId
     const existingQuiz = await prisma.quiz.findUnique({
       where: { moduleId },
       include: { questions: true },
     });
 
     if (existingQuiz) {
-      // **Hapus quiz lama beserta pertanyaan dan pilihan jawabannya**
+      // Delete all blob images from questions before deleting the quiz
+      for (const question of existingQuiz.questions) {
+        if (question.imageUrl) {
+          try {
+            // Extract blob URL from the full URL
+            const blobUrl = new URL(question.imageUrl);
+            await del(blobUrl);
+            console.log(`Deleted blob for question ID: ${question.id}`);
+          } catch (blobError) {
+            console.error(`Failed to delete blob for question ID: ${question.id}`, blobError);
+            // Continue with deletion even if blob delete fails
+          }
+        }
+      }
+
+
+      // Delete the old quiz along with its questions and answer options
       await prisma.quiz.delete({
         where: { id: existingQuiz.id },
       });
     }
 
-    // Proses setiap pertanyaan dan cek apakah ada gambar
+    // Process each question and check if there's an image
     const questionData = await Promise.all(
       questions.map(async (q, index) => {
-        const image = formData.get(`questionImage${index}`); // Ambil gambar sesuai indeks pertanyaan
+        const image = formData.get(`questionImage${index}`); // Get image according to question index
         let imageUrl = null;
 
         if (image) {
-          const filePath = `./public/uploads/${Date.now()}-${image.name}`;
-          await writeFile(filePath, Buffer.from(await image.arrayBuffer()));
-          imageUrl = `/uploads/${path.basename(filePath)}`;
+          // Upload image to Vercel Blob
+          const imageBlob = await put(
+            `uploads/quiz/${Date.now()}-${image.name}`,
+            image.stream(),
+            {
+              access: "public",
+            }
+          );
+
+          // Get the URL of the uploaded image
+          imageUrl = imageBlob.url;
         }
 
         return {
           text: q.text,
-          imageUrl, // Simpan URL gambar pertanyaan (jika ada)
+          imageUrl, // Store the question image URL (if any)
           options: {
             create: q.options.map((opt) => ({
               text: opt.text,
@@ -67,7 +91,7 @@ export async function POST(req) {
       })
     );
 
-    // Simpan kuis tanpa imageUrl karena tidak diperlukan
+    // Save the quiz without imageUrl as it's not needed
     const quiz = await prisma.quiz.create({
       data: {
         title,

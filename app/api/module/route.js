@@ -1,8 +1,7 @@
 //module
 import { PrismaClient } from "@prisma/client";
 import { verifyToken } from "../../utils/auth";
-import path from "path";
-import { writeFile } from "fs/promises";
+import { del, put } from "@vercel/blob";
 
 const prisma = new PrismaClient();
 
@@ -35,25 +34,25 @@ export async function POST(req) {
       );
     }
 
-    // Save the outsideImage locally (or replace this with cloud storage logic)
-    const outsideImageFilePath = `./public/uploads/${Date.now()}-${
-      outsideImage.name
-    }`;
-    const insideImageFilePath = `./public/uploads/${Date.now()}-${
-      insideImage.name
-    }`;
-    await writeFile(
-      outsideImageFilePath,
-      Buffer.from(await outsideImage.arrayBuffer())
+    // Upload images to Vercel Blob
+    const outsideImageBlob = await put(
+      `uploads/${Date.now()}-${outsideImage.name}`,
+      outsideImage.stream(),
+      {
+        access: "public",
+      }
     );
-    await writeFile(
-      insideImageFilePath,
-      Buffer.from(await insideImage.arrayBuffer())
+    const insideImageBlob = await put(
+      `uploads/${Date.now()}-${insideImage.name}`,
+      insideImage.stream(),
+      {
+        access: "public",
+      }
     );
 
-    // Generate the URL (modify this for cloud storage)
-    const outsideImageUrl = `/uploads/${path.basename(outsideImageFilePath)}`;
-    const insideImageUrl = `/uploads/${path.basename(insideImageFilePath)}`;
+    // Get the URLs of the uploaded images
+    const outsideImageUrl = outsideImageBlob.url;
+    const insideImageUrl = insideImageBlob.url;
 
     // Create the module entry in the database
     const module = await prisma.module.create({
@@ -148,13 +147,64 @@ export async function DELETE(req) {
   try {
     const { id } = await req.json();
 
-    const module = await prisma.module.findUnique({ where: { id } });
+    const module = await prisma.module.findUnique({
+      where: { id },
+      include: { quiz: { include: { questions: true } } },
+    });
 
     if (!module || decoded.role !== "ADMIN") {
       return Response.json(
         { message: "Module not found or unauthorized" },
         { status: 403 }
       );
+    }
+
+    // Delete blob images associated with the module
+    if (module.outsideImageUrl) {
+      try {
+        const outsideBlobUrl = new URL(module.outsideImageUrl);
+        await del(outsideBlobUrl);
+        console.log(`Deleted outside image blob for module ID: ${module.id}`);
+      } catch (blobError) {
+        console.error(
+          `Failed to delete outside image blob for module ID: ${module.id}`,
+          blobError
+        );
+        // Continue with deletion even if blob delete fails
+      }
+    }
+
+    if (module.insideImageUrl) {
+      try {
+        const insideBlobUrl = new URL(module.insideImageUrl);
+        await del(insideBlobUrl);
+        console.log(`Deleted inside image blob for module ID: ${module.id}`);
+      } catch (blobError) {
+        console.error(
+          `Failed to delete inside image blob for module ID: ${module.id}`,
+          blobError
+        );
+        // Continue with deletion even if blob delete fails
+      }
+    }
+
+    // Delete blob images associated with quiz questions if the module has a quiz
+    if (module.quiz) {
+      for (const question of module.quiz.questions) {
+        if (question.imageUrl) {
+          try {
+            const questionBlobUrl = new URL(question.imageUrl);
+            await del(questionBlobUrl);
+            console.log(`Deleted image blob for question ID: ${question.id}`);
+          } catch (blobError) {
+            console.error(
+              `Failed to delete image blob for question ID: ${question.id}`,
+              blobError
+            );
+            // Continue with deletion even if blob delete fails
+          }
+        }
+      }
     }
 
     await prisma.module.delete({ where: { id } });
