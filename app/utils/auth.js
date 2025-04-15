@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 import nodemailer from "nodemailer";
+import * as crypto from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -14,7 +15,7 @@ export const comparePassword = async (password, hashedPassword) => {
 };
 
 export const generateVerificationToken = () => {
-  return Crypto.randomBytes(32).toString("hex");
+  return crypto.randomBytes(32).toString("hex");
 };
 
 export const sendVerificationEmail = async (email, token) => {
