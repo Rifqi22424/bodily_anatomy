@@ -31,7 +31,7 @@ export default function QuizResult() {
     return (
       <div className=" bg-gradient-to-b from-blue-50 to-blue-200 text-black h-screen w-screen flex flex-col justify-center items-center">
         <div className="w-20 h-20 animate-spin">
-          <span className="text-4xl">🦴</span>
+          <span className="text-4xl">🫀</span>
         </div>
         <p className="mt-4 text-lg font-semibold text-blue-800">Loading...</p>
       </div>
